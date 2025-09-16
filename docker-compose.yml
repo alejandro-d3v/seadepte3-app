@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    ports:
+      - "443:443"
+
+  native:
+    build:
+      context: .
+      dockerfile: Dockerfile.native
+    volumes:
+      - .:/usr/src/app
+    working_dir: /usr/src/app
+    tty: true

@@ -1,0 +1,31 @@
+FROM node:18.18.2-bullseye
+
+# Dependencias del sistema para Cordova/Ionic/Gradle
+RUN apt-get update && apt-get install -y \
+    git \
+    unzip \
+    openjdk-11-jdk \
+    gradle \
+    build-essential \
+    ruby \
+    ruby-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Instalar Ionic y Cordova globalmente
+RUN npm install -g @ionic/cli@7.2.0 cordova@11.0.0
+
+WORKDIR /usr/src/app
+
+# Copiar package.json primero para aprovechar cache de docker
+COPY package*.json ./
+
+# Instalar dependencias SIN ejecutar postinstall
+RUN npm install --ignore-scripts
+
+# Copiar el resto del código MoodleApp
+COPY . .
+
+# Ejecutar patch-package manualmente (sin el cd cordova-plugin-moodleapp)
+RUN npx patch-package || true
+
+CMD ["bash"]
